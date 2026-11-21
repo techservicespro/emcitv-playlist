@@ -1,29 +1,18 @@
-# EMCI TV Afrique — Playlist IPTV
-
-Source Dailymotion : https://geo.dailymotion.com/videos/x8azdkm
-
-## Installation GitHub
-
-1. Ouvrir le dépôt public `techservicespro/emcitv-playlist` (ou le créer).
-2. Envoyer **tous** les fichiers en conservant le chemin `.github/workflows/update.yml`.
-3. Dans **Settings → Actions → General → Workflow permissions**, choisir **Read and write permissions** si nécessaire. Vérifier aussi que GitHub Actions est activé.
-4. Ouvrir **Actions → Update EMCI TV Afrique playlist → Run workflow**.
-5. Attendre la réussite, puis vérifier que `EMCI-TV.m3u` contient une ligne `#EXTINF` et une URL HLS. **Avant ce premier succès, le fichier est un modèle non lisible.**
-6. Ajouter dans VLC ou IPTV Smarters :
-
-   https://raw.githubusercontent.com/techservicespro/emcitv-playlist/main/EMCI-TV.m3u
-
-Si votre compte, dépôt ou branche diffère, adapter l'URL.
-
-## Fonctionnement et limites
-
-Le script `update_emci.py` interroge les métadonnées Dailymotion, vérifie que l'URL renvoyée est bien un manifeste HLS, puis remplace la playlist. Le workflow tente une mise à jour environ toutes les 30 minutes ; les exécutions planifiées GitHub peuvent être retardées ou désactivées. Le lien de la playlist GitHub reste stable, mais les URL vidéo contiennent des jetons temporaires et peuvent expirer entre deux mises à jour ou pendant la lecture. Les lecteurs IPTV peuvent nécessiter un rechargement manuel.
-
-L'accès automatisé et la redistribution des URL doivent respecter les conditions de Dailymotion et les droits du diffuseur. En cas de refus (403, etc.), le script conserve l'ancien fichier plutôt que de publier un lien invalide. Une lecture VLC réussie sur un poste ne garantit pas que les serveurs GitHub Actions auront accès au même flux.
-
-## Dépannage
-
-- **Actions échoue en 403** : l'accès peut être limité à certains clients/réseaux. Ne pas essayer de contourner ces restrictions ; demander un accès HLS officiel.
-- **Push refusé** : vérifier les permissions d'écriture du workflow et les règles de protection de la branche.
-- **Playlist inchangée** : vérifier les logs dans l'onglet Actions.
-- **Flux ne joue plus** : relancer le workflow et recharger la playlist dans le lecteur ; cela peut ne pas suffire si la source a changé ses conditions d'accès.
+EMCI TV Afrique — Playlist IPTV
+Source : https://geo.dailymotion.com/videos/x8azdkm
+Playlist publique : https://raw.githubusercontent.com/techservicespro/emcitv-playlist/main/EMCI-TV.m3u
+Installation
+Décompresser l'archive et transférer les quatre fichiers dans le dépôt `techservicespro/emcitv-playlist`, en conservant le dossier caché `.github/workflows/`.
+Remplacer les fichiers existants. Attention : `EMCI-TV.m3u` est fourni comme modèle non lisible ; la première exécution réussie doit le remplir.
+Dans GitHub, ouvrir Actions → Update EMCI TV Afrique playlist → Run workflow.
+Ouvrir le journal Update EMCI TV playlist et vérifier la présence de `HLS manifest reachable from runner`.
+Ouvrir `EMCI-TV.m3u` pour vérifier que l'adresse HLS a été enregistrée.
+Tester l'adresse de la playlist dans VLC. Un succès dans GitHub Actions ne garantit pas que VLC ou une Smart TV pourra lire le flux.
+Ce qui a été corrigé
+Actions `checkout@v5` et `setup-python@v6` (Node.js 24).
+Concurrence limitée à une exécution à la fois.
+Journal UTC et empreinte SHA-256 tronquée pour comparer les URL sans divulguer le jeton dans les logs.
+Distinction explicite entre « manifeste accessible depuis GitHub » et « flux lisible ailleurs ».
+Préservation du fichier précédent en cas d'échec, avec un message d'erreur explicite.
+Limites importantes
+Les URL `?sec=...` de Dailymotion sont temporaires et peuvent être soumises à des contrôles d'accès (403). La playlist GitHub est statique entre deux exécutions et ne génère pas un jeton adapté à chaque lecteur. La programmation GitHub Actions toutes les 30 minutes est approximative, pas garantie à la minute. Même un workflow vert ne prouve pas que la vidéo est lisible sur un autre réseau ou appareil. Ce projet ne contourne pas les restrictions Dailymotion ; un accès HLS officiel et autorisé reste préférable pour une IPTV multi-appareils.
