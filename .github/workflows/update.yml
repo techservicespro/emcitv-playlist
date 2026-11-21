@@ -1,7 +1,7 @@
 
 name: Update EMCI TV Afrique playlist
 
-on:
+"on":
   workflow_dispatch:
   schedule:
     - cron: "*/30 * * * *"
@@ -12,6 +12,7 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -21,7 +22,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Update playlist
+      - name: Update EMCI TV playlist
         run: python update_emci.py
 
       - name: Commit updated playlist
@@ -33,4 +34,3 @@ jobs:
             git commit -m "Update EMCI TV Afrique stream"
             git push
           fi
-
