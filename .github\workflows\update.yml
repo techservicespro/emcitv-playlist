@@ -1,31 +1,35 @@
+
 name: Update EMCI TV Afrique playlist
+
 on:
-  schedule:
-    - cron: '7,37 * * * *'
   workflow_dispatch:
+  schedule:
+    - cron: "*/30 * * * *"
+
 permissions:
   contents: write
+
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          persist-credentials: true
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Refresh M3U
+          python-version: "3.11"
+
+      - name: Update playlist
         run: python update_emci.py
-      - name: Commit if changed
+
+      - name: Commit updated playlist
         run: |
-          if git diff --quiet -- EMCI-TV.m3u; then
-            echo 'No change'
-            exit 0
-          fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add EMCI-TV.m3u
-          git commit -m 'Refresh EMCI TV Afrique HLS URL'
-          git push
+          if ! git diff --cached --quiet; then
+            git commit -m "Update EMCI TV Afrique stream"
+            git push
+          fi
